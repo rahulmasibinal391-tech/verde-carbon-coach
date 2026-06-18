@@ -4,6 +4,7 @@
 
 import { state, FACTORS, BENCHMARKS, TRANSPORT_LABELS, DIET_LABELS } from './state.js';
 import { getBreakdown, getStandingText } from './calculations.js';
+import { generateInsights } from './insights.js';
 import {
   recalculate,
   renderTrips,
@@ -272,135 +273,7 @@ function initWaste() {
   });
 }
 
-/**
- * Safe local rule-based fallback generation for client in case of complete server disconnect.
- * @param {Object} b - Breakdown emissions dataset.
- * @param {number} total - Calculated footprint summation.
- * @returns {string} Fully structured HTML content snippet.
- */
-function renderLocalRuleBasedInsights(b, total) {
-  const categories = {
-    Transport: b.transport,
-    Diet: b.diet,
-    Energy: b.energy,
-    Shopping: b.shopping,
-    'Food Waste': b.waste,
-    Flights: b.flight
-  };
 
-  let biggest = '';
-  let biggestVal = 0;
-  for (const [cat, val] of Object.entries(categories)) {
-    if (val > biggestVal) {
-      biggestVal = val;
-      biggest = cat;
-    }
-  }
-
-  const standingText = getStandingText(total);
-  const maxCat = Math.max(...Object.values(categories), 1);
-  
-  const breakdownHTML = Object.entries(categories)
-    .filter(([, v]) => v > 0)
-    .sort(([, a], [, b]) => b - a)
-    .map(([cat, val]) => {
-      const cls = cat.toLowerCase().replace(' ', '');
-      const catCls = {
-        transport: 'transport',
-        diet: 'diet',
-        energy: 'energy',
-        shopping: 'shopping',
-        foodwaste: 'waste',
-        flights: 'flight'
-      }[cls] || 'transport';
-      const pct = (val / maxCat) * 100;
-      return `
-      <div class="breakdown-row">
-        <span class="breakdown-label">${cat}</span>
-        <div class="breakdown-track"><div class="breakdown-fill ${catCls}" style="width:${pct}%"></div></div>
-        <span class="breakdown-val">${val.toFixed(1)} kg</span>
-      </div>`;
-    })
-    .join('');
-
-  return `
-    <p>Your daily total is <span class="insight-stat">${total.toFixed(1)} kg CO2e</span>. ${standingText}</p>
-    <div class="breakdown-bars">${breakdownHTML}</div>
-    <p>Your biggest contributor today is <strong>${biggest}</strong> at ${biggestVal.toFixed(1)} kg.</p>
-    <div class="insight-tip">Try to reduce ${biggest.toLowerCase()} usage tomorrow to make a positive impact!</div>
-    <p class="insight-encourage">Every small choice counts. Tracking is the first step! 🌍</p>
-  `;
-}
-
-/**
- * Calls backend API to fetch Gemini-powered insights based on history and breakdown.
- */
-async function generateInsights() {
-  const b = getBreakdown(state);
-  const total = b.transport + b.diet + b.energy + b.shopping + b.waste + b.flight;
-  const panel = $('#insights-panel');
-  const content = $('#insights-content');
-
-  if (!panel || !content) return;
-
-  if (total === 0) {
-    panel.classList.remove('hidden');
-    content.innerHTML = `
-      <div class="verde-avatar"><span>🌿</span> Verde</div>
-      <p>Hmm, looks like you haven't logged anything yet! Tell me about your day — how did you get around, what did you eat, and did you run the AC or any appliances?</p>
-    `;
-    return;
-  }
-
-  // Display skeletons UI immediately
-  toggleSkeleton(true);
-
-  try {
-    const response = await fetch('/api/insights', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        breakdown: b,
-        history: state.history.slice(-14)
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    let badgeHTML = '';
-    if (data.source === 'gemini') {
-      badgeHTML = '<span class="ai-badge">AI-powered</span>';
-    }
-
-    content.innerHTML = `
-      <div class="verde-avatar"><span>🌿</span> Verde ${badgeHTML}</div>
-      ${data.insights}
-    `;
-    panel.classList.remove('hidden');
-
-    // Save to persistence
-    saveDay(total, b);
-    renderHistory();
-  } catch (error) {
-    console.error('Insights Dispatch Error:', error);
-    
-    // Client-side hard rule-based generation fallback
-    const fallbackHTML = renderLocalRuleBasedInsights(b, total);
-    content.innerHTML = `
-      <div class="verde-avatar"><span>🌿</span> Verde <span class="ai-badge" style="background:var(--text-muted)">Offline</span></div>
-      ${fallbackHTML}
-    `;
-    panel.classList.remove('hidden');
-
-    saveDay(total, b);
-    renderHistory();
-  }
-}
 
 /**
  * Wires up insights button.

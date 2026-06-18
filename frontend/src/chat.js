@@ -3,6 +3,9 @@
  */
 
 import { state } from './state.js';
+import { getBreakdown } from './calculations.js';
+import { getGeminiChatReply } from './gemini.js';
+import { trackEvent } from './analytics.js';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -105,6 +108,22 @@ export async function sendChat() {
 
   const typingEl = showTyping();
 
+  // Try client-side Gemini chat first if key is present
+  try {
+    const currentBreakdown = getBreakdown(state);
+    const geminiReply = await getGeminiChatReply(text, currentBreakdown, state.history);
+
+    if (geminiReply) {
+      if (typingEl) typingEl.remove();
+      appendMessage('verde', geminiReply, 'gemini');
+      trackEvent('chat_message', { source: 'gemini' });
+      return;
+    }
+  } catch (err) {
+    console.warn('Client-side Gemini chat failed, trying backend proxy:', err);
+  }
+
+  // Fallback to backend proxy
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -121,6 +140,7 @@ export async function sendChat() {
     if (typingEl) typingEl.remove();
 
     appendMessage('verde', data.reply, data.source || 'rule-based');
+    trackEvent('chat_message', { source: data.source || 'rule-based' });
   } catch (error) {
     console.error('Chat API Error:', error);
     if (typingEl) typingEl.remove();
@@ -131,6 +151,7 @@ export async function sendChat() {
       `<p>Oops, I had trouble reaching my server. Here's a quick tip: Swapping a short car drive for a walk or cycle ride cuts carbon emissions to zero immediately! 🚲</p>`, 
       'rule-based'
     );
+    trackEvent('chat_message', { source: 'offline-fallback' });
   }
 }
 

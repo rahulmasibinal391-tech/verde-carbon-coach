@@ -7,7 +7,8 @@ import {
   getBreakdown,
   calculateStreak,
   parseActivities,
-  getStandingText
+  getStandingText,
+  computeEmission
 } from '../../frontend/src/calculations.js';
 
 describe('Carbon Emission Calculations', () => {
@@ -129,3 +130,15 @@ describe('Emissions Standing Feedback Text', () => {
     expect(standingOverBoth).toContain('above the 1.5°C target');
   });
 });
+
+describe('Individual Transport Emission Calculation', () => {
+  it('should calculate emission correctly for various transport modes', () => {
+    expect(computeEmission('car', 10)).toBeCloseTo(2.1);
+    expect(computeEmission('cycle', 5)).toBe(0);
+    expect(computeEmission('bus', 15)).toBeCloseTo(0.6);
+    expect(computeEmission('auto', 8)).toBeCloseTo(1.2);
+    expect(computeEmission('motorbike', 10)).toBeCloseTo(1.1);
+    expect(computeEmission('unknown_mode', 10)).toBe(0);
+  });
+});
+

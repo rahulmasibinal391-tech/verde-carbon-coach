@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://accounts.google.com; img-src 'self' data: https://lh3.googleusercontent.com; frame-src https://accounts.google.com; object-src 'none';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://accounts.google.com https://generativelanguage.googleapis.com https://www.google-analytics.com https://analytics.google.com; img-src 'self' data: https://lh3.googleusercontent.com https://www.google-analytics.com https://analytics.google.com; frame-src https://accounts.google.com; object-src 'none';" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verde — Your Personal Carbon Coach</title>
   <meta name="description" content="Track, understand, and reduce your daily carbon footprint with Verde — a warm, personalized AI carbon coach that turns climate awareness into simple action." />
@@ -14,8 +14,17 @@
   <link rel="stylesheet" href="styles.css?v=3" />
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 </head>
 <body>
+  <a href="#app" class="skip-link">Skip to main content</a>
   <!-- ═══════ SPLASH SCREEN ═══════ -->
   <div id="splash" class="splash" aria-label="Loading screen">
     <div class="splash-content">
@@ -367,6 +376,10 @@
     data-auto_prompt="false">
   </div>
 
+  <script>
+    // Paste your Gemini API key from https://aistudio.google.com here
+    window.GEMINI_API_KEY = '';
+  </script>
   <script type="module" src="src/main.js"></script>
   <script type="module" src="src/auth.js"></script>
 </body>

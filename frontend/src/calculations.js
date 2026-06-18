@@ -218,3 +218,32 @@ export function getStandingText(total, benchmarks = BENCHMARKS) {
     return `That's above both benchmarks, but no worries — big numbers often come from one-off things. Let's spot the easy fix.`;
   }
 }
+
+/**
+ * Calculates transport emissions based on mode and distance.
+ *
+ * @param {string} mode - Transport mode (e.g., 'car', 'motorbike', 'bus', 'auto', 'cycle').
+ * @param {number} km - Distance in kilometers.
+ * @param {Object} [factors=FACTORS] - The emission factors reference map.
+ * @returns {number} Calculated emissions in kg CO2e.
+ */
+export function computeEmission(mode, km, factors = FACTORS) {
+  const normMode = (mode || '').toLowerCase();
+  if (normMode === 'car') {
+    return km * factors.transport.car;
+  }
+  if (normMode === 'motorbike' || normMode === 'bike') {
+    return km * factors.transport.motorbike;
+  }
+  if (normMode === 'bus' || normMode === 'metro' || normMode === 'train') {
+    return km * factors.transport.bus;
+  }
+  if (normMode === 'auto' || normMode === 'rickshaw') {
+    return km * factors.transport.auto;
+  }
+  if (normMode === 'cycle' || normMode === 'walk') {
+    return km * factors.transport.cycle;
+  }
+  return 0;
+}
+

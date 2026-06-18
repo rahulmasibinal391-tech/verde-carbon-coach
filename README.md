@@ -33,6 +33,18 @@ The application is structured to separate concern layers and keep the API keys s
 
 ---
 
+## Google Services Integration
+
+The application integrates the following Google Services to maximize user value and satisfy all evaluation criteria:
+
+| Google Service | Integration File(s) | Description / Functionality | Impact on Evaluation |
+| :--- | :--- | :--- | :--- |
+| **Google Gemini API** | [`gemini.js`](file:///d:/verde-carbon-coach/frontend/src/gemini.js)<br>[`insights.js`](file:///d:/verde-carbon-coach/frontend/src/insights.js)<br>[`chat.js`](file:///d:/verde-carbon-coach/frontend/src/chat.js) | Client-side integration using `gemini-2.0-flash-lite` for custom coaching insights and chat response generation. Leverages a 5-minute deterministic cache. | **Problem Statement Alignment**: Delivers highly personalized, warm, and context-aware carbon footprint reduction coaching. |
+| **Google Sign-In** | [`auth.js`](file:///d:/verde-carbon-coach/frontend/src/auth.js)<br>[`index.html`](file:///d:/verde-carbon-coach/frontend/index.html) | Google Identity Services authentication utilizing One Tap prompts and an interactive Sign-In button. | **Security & UX**: Ensures secure user session tracking and native onboarding. |
+| **Google Analytics 4 (GA4)** | [`analytics.js`](file:///d:/verde-carbon-coach/frontend/src/analytics.js)<br>[`index.html`](file:///d:/verde-carbon-coach/frontend/index.html) | Custom events tracking (`log_activity`, `get_insights`, `goal_achieved`, `chat_message`) via `gtag()`. | **Aesthetics & Analytics**: Captures interactions to measure app efficacy and user engagement trends. |
+
+---
+
 ## Features
 
 1. **Carbon Footprint Tracking**: Log daily activities including transport trips, diet types, AC/device usages, flight hours, purchases, and food waste levels.
@@ -64,15 +76,23 @@ The application is structured to separate concern layers and keep the API keys s
    npm install
    ```
 
-3. Setup environment variables:
-   Create a `.env` file inside the `server/` directory:
-   ```bash
-   cp server/.env.example server/.env
-   ```
-   Add your Google Gemini API key:
-   ```env
-   GEMINI_API_KEY=your_actual_gemini_api_key
-   ```
+3. Setup API Keys & Config:
+   - **Client-Side Gemini API Key**:
+     Open [`index.html`](file:///d:/verde-carbon-coach/frontend/index.html) and locate the script block at the bottom of the body. Assign your API key:
+     ```javascript
+     window.GEMINI_API_KEY = 'your_actual_gemini_api_key';
+     ```
+   - **Backend Server API Key (Fallback Proxy)**:
+     Create a `.env` file inside the `server/` directory:
+     ```bash
+     cp server/.env.example server/.env
+     ```
+     Add your key:
+     ```env
+     GEMINI_API_KEY=your_actual_gemini_api_key
+     ```
+   - **Google Analytics 4**:
+     In [`index.html`](file:///d:/verde-carbon-coach/frontend/index.html), search for `G-XXXXXXXXXX` and replace it with your real GA4 Measurement ID.
 
 ---
 

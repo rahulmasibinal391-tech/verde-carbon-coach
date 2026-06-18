@@ -1591,3 +1591,50 @@ input:focus:not(:focus-visible) {
   }
 }
 
+/* ─── Accessibility Enhancements ─── */
+
+/* Global focus-visible style for keyboard navigation */
+:focus-visible {
+  outline: 3px solid var(--emerald-400) !important;
+  outline-offset: 3px !important;
+}
+
+/* Skip to Content link styling */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 20px;
+  background: linear-gradient(135deg, var(--emerald-600), var(--emerald-500));
+  color: #fff !important;
+  padding: 12px 20px;
+  border-radius: var(--r-md);
+  z-index: 10000;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(52, 211, 153, 0.2);
+  transition: top var(--dur-mid) var(--ease-spring);
+}
+
+.skip-link:focus-visible {
+  top: 20px;
+  outline: none !important;
+}
+
+/* System prefers-reduced-motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *, *::before, *::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+

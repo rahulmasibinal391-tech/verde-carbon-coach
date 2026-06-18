@@ -1,5 +1,5 @@
-node_modules/ 
-.env 
-edge_debug.log 
-edge_stdout.log 
-edge_stderr.log 
+node_modules/
+.env
+*.log
+edge-profile/
+dist/

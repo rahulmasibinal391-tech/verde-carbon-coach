@@ -5,11 +5,12 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "vite frontend --port 3000",
     "dev:server": "node server/server.js",
     "dev:client": "vite frontend",
     "build": "vite build frontend --outDir ../dist",
     "preview": "vite preview frontend",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run --coverage",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lint": "eslint \"frontend/src/**/*.js\" \"server/**/*.js\"",
